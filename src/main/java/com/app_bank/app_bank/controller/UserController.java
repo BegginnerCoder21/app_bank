@@ -1,12 +1,10 @@
 package com.app_bank.app_bank.controller;
 
 import com.app_bank.app_bank.dto.BankResponse;
+import com.app_bank.app_bank.dto.EnquiryRequest;
 import com.app_bank.app_bank.dto.UserRequest;
 import com.app_bank.app_bank.services.UserService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
@@ -23,5 +21,17 @@ public class UserController {
     {
 
        return this.userService.createAccount(userRequest);
+    }
+
+    @GetMapping("/balanceEnquiry")
+    public BankResponse balanceEnquiry(@RequestBody EnquiryRequest enquiryRequest)
+    {
+        return this.userService.balanceEnquiry(enquiryRequest);
+    }
+
+    @GetMapping("/nameEnquiry")
+    public String nameEnquiry(@RequestBody EnquiryRequest enquiryRequest)
+    {
+        return this.userService.nameEnquiry(enquiryRequest);
     }
 }

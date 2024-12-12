@@ -11,6 +11,12 @@ public class AccountUtils {
     public static final String ACCOUNT_CREATION_CODE = "002";
     public static final String ACCOUNT_CREATION_MESSAGE = "Votre compte a été crée avec succès";
     public static final String ACCOUNT_CREATION_MAIL_SUBJECT = "Créaction de compte.";
+    public static final String ACCOUNT_NO_EXIST_CODE = "003";
+    public static final String ACCOUNT_NO_EXIST_MESSAGE = "L'utilisateur n'a pas été trouvé !";
+    public static final String ACOUNT_FOUND_CODE = "004";
+    public static final String ACCOUNT_FOUND_MESSAGE = "Compte D'utilisateur Trouvé !";
+    public static final String ACCOUNT_CREDITED_SUCCESS_CODE = "005";
+    public static final String ACCOUNT_CREDITED_SUCCESS_MESSAGE = "Le compte a bien été credité";
 
     public static String generateAccountNumber(){
 
