@@ -1,21 +1,27 @@
-package com.app_bank.app_bank.services.impl;
+package com.app_bank.app_bank.services;
 
 import com.app_bank.app_bank.dto.AccountInfo;
 import com.app_bank.app_bank.dto.BankResponse;
+import com.app_bank.app_bank.dto.EmailDetails;
 import com.app_bank.app_bank.dto.UserRequest;
 import com.app_bank.app_bank.entity.User;
 import com.app_bank.app_bank.repository.UserRepository;
 import com.app_bank.app_bank.utils.AccountUtils;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
+@Service
 public class UserServiceImpl implements UserService{
 
     private UserRepository userRespository;
+    private EmailService emailService;
 
-    public UserServiceImpl(UserRepository userRespository) {
+    public UserServiceImpl(EmailService emailService, UserRepository userRespository) {
+        this.emailService = emailService;
         this.userRespository = userRespository;
     }
+
 
     @Override
     public BankResponse createAccount(UserRequest userRequest) {
@@ -45,11 +51,19 @@ public class UserServiceImpl implements UserService{
 
         User saveUser = this.userRespository.save(newUser);
 
+        String fullNameUser = AccountUtils.fullNameUser(saveUser);
+        this.emailService.sendMailAlert(EmailDetails.builder()
+                        .recipient(saveUser.getEmail())
+                        .subject(AccountUtils.ACCOUNT_CREATION_MAIL_SUBJECT)
+                        .mailBody("Félicitatiion ! Votre compte a été crée avec succès \nLes Détails Du Compte: \n" +
+                                "Nom Du Compte: " + fullNameUser + "\nNumero Du Compte: " + saveUser.getAccountNumber())
+                .build());
+
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_CREATION_CODE)
                 .responseMessage(AccountUtils.ACCOUNT_CREATION_MESSAGE)
                 .accountInfo(AccountInfo.builder()
-                        .accountName(saveUser.getFirstname() + " " + saveUser.getLastname() + " " + saveUser.getOtherName())
+                        .accountName(fullNameUser)
                         .accountNumber(saveUser.getAccountNumber())
                         .accountBalance(saveUser.getAccountBalance())
                         .build())
