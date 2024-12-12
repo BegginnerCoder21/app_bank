@@ -138,4 +138,50 @@ public class UserServiceImpl implements UserService{
                         .build())
                 .build();
     }
+
+    public BankResponse debitAccount(CreditDebitRequest request)
+    {
+        boolean isAccountExist = this.userRespository.existsByAccountNumber(request.getAccountNumber());
+
+        System.out.println(request.getAccountNumber());
+        if(!isAccountExist)
+        {
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.ACCOUNT_NO_EXIST_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_NO_EXIST_MESSAGE)
+                    .accountInfo(null)
+                    .build();
+        }
+
+        User foundUser = this.userRespository.findByAccountNumber(request.getAccountNumber());
+
+        int checkUserBalance = foundUser.getAccountBalance().compareTo(request.getAmount());
+        System.out.println(checkUserBalance);
+        if(checkUserBalance < 0)
+        {
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.ACCOUNT_BALANCE_NOT_SUFFICIENT_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_BALANCE_NOT_SUFFICIENT_MESSAGE)
+                    .accountInfo(AccountInfo.builder()
+                            .accountNumber(foundUser.getAccountNumber())
+                            .accountName(AccountUtils.fullNameUser(foundUser))
+                            .accountBalance(foundUser.getAccountBalance())
+                            .build())
+                    .build();
+        }
+
+        foundUser.setAccountBalance(foundUser.getAccountBalance().subtract(request.getAmount()));
+        this.userRespository.save(foundUser);
+
+        return BankResponse.builder()
+                .responseCode(AccountUtils.ACCOUNT_DEBITED_SUCCESS_CODE)
+                .responseMessage("Le compte a bien été dédité de " + request.getAmount())
+                .accountInfo(AccountInfo.builder()
+                        .accountNumber(foundUser.getAccountNumber())
+                        .accountName(AccountUtils.fullNameUser(foundUser))
+                        .accountBalance(foundUser.getAccountBalance())
+                        .build())
+                .build();
+
+    }
 }

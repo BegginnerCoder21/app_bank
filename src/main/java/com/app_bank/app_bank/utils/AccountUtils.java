@@ -17,6 +17,9 @@ public class AccountUtils {
     public static final String ACCOUNT_FOUND_MESSAGE = "Compte D'utilisateur Trouvé !";
     public static final String ACCOUNT_CREDITED_SUCCESS_CODE = "005";
     public static final String ACCOUNT_CREDITED_SUCCESS_MESSAGE = "Le compte a bien été credité";
+    public static final String ACCOUNT_BALANCE_NOT_SUFFICIENT_CODE = "006";
+    public static final String ACCOUNT_BALANCE_NOT_SUFFICIENT_MESSAGE = "Le solde du compte est insuffisant";
+    public static final String ACCOUNT_DEBITED_SUCCESS_CODE = "007";
 
     public static String generateAccountNumber(){
 
