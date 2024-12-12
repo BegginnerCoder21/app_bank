@@ -81,15 +81,15 @@ public class UserServiceImpl implements UserService{
                     .build();
         }
 
-        User userFound = this.userRespository.findByAccountNumber(request.getAccountNumber());
+        User foundUser = this.userRespository.findByAccountNumber(request.getAccountNumber());
 
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACOUNT_FOUND_CODE)
                 .responseMessage(AccountUtils.ACCOUNT_FOUND_MESSAGE)
                 .accountInfo(AccountInfo.builder()
-                        .accountNumber(userFound.getAccountNumber())
-                        .accountName(AccountUtils.fullNameUser(userFound))
-                        .accountBalance(userFound.getAccountBalance())
+                        .accountNumber(foundUser.getAccountNumber())
+                        .accountName(AccountUtils.fullNameUser(foundUser))
+                        .accountBalance(foundUser.getAccountBalance())
                         .build())
                 .build();
     }
@@ -97,19 +97,45 @@ public class UserServiceImpl implements UserService{
     @Override
     public String nameEnquiry(EnquiryRequest request) {
         boolean isAccountExist = this.userRespository.existsByAccountNumber(request.getAccountNumber());
-        System.out.println(request.getAccountNumber());
+        //System.out.println(request.getAccountNumber());
         if(!isAccountExist)
         {
             return AccountUtils.ACCOUNT_NO_EXIST_MESSAGE;
         }
 
-        User userFound = this.userRespository.findByAccountNumber(request.getAccountNumber());
+        User foundUser = this.userRespository.findByAccountNumber(request.getAccountNumber());
 
-        return AccountUtils.fullNameUser(userFound);
+        return AccountUtils.fullNameUser(foundUser);
     }
 
     @Override
     public BankResponse creditAccount(CreditDebitRequest request) {
-        return null;
+        boolean isAccountExist = this.userRespository.existsByAccountNumber(request.getAccountNumber());
+
+        //System.out.println(request.getAccountNumber());
+        if(!isAccountExist)
+        {
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.ACCOUNT_NO_EXIST_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_NO_EXIST_MESSAGE)
+                    .accountInfo(null)
+                    .build();
+        }
+
+        User foundUser = this.userRespository.findByAccountNumber(request.getAccountNumber());
+
+        foundUser.setAccountBalance(foundUser.getAccountBalance().add(request.getAmount()));
+        this.userRespository.save(foundUser);
+
+
+        return BankResponse.builder()
+                .responseCode(AccountUtils.ACCOUNT_CREDITED_SUCCESS_CODE)
+                .responseMessage(AccountUtils.ACCOUNT_CREDITED_SUCCESS_MESSAGE)
+                .accountInfo(AccountInfo.builder()
+                        .accountNumber(foundUser.getAccountNumber())
+                        .accountName(AccountUtils.fullNameUser(foundUser))
+                        .accountBalance(foundUser.getAccountBalance())
+                        .build())
+                .build();
     }
 }
