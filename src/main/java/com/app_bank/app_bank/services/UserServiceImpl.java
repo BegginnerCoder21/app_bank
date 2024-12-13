@@ -143,7 +143,7 @@ public class UserServiceImpl implements UserService{
     {
         boolean isAccountExist = this.userRespository.existsByAccountNumber(request.getAccountNumber());
 
-        System.out.println(request.getAccountNumber());
+        //System.out.println(request.getAccountNumber());
         if(!isAccountExist)
         {
             return BankResponse.builder()
@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService{
         User foundUser = this.userRespository.findByAccountNumber(request.getAccountNumber());
 
         int checkUserBalance = foundUser.getAccountBalance().compareTo(request.getAmount());
-        System.out.println(checkUserBalance);
+        //System.out.println(checkUserBalance);
         if(checkUserBalance < 0)
         {
             return BankResponse.builder()
@@ -183,5 +183,39 @@ public class UserServiceImpl implements UserService{
                         .build())
                 .build();
 
+    }
+
+    @Override
+    public BankResponse TransfertBalance(TransfertRequest request) {
+
+        BankResponse resultDebit = debitAccount(CreditDebitRequest.builder()
+                .accountNumber(request.getSourceAccountNumber())
+                .amount(request.getAmount())
+                .build());
+
+        if(resultDebit.getResponseCode().equals(AccountUtils.ACCOUNT_NO_EXIST_CODE) || resultDebit.getResponseCode().equals(AccountUtils.ACCOUNT_BALANCE_NOT_SUFFICIENT_CODE))
+        {
+            return resultDebit;
+        }
+
+        BankResponse resultCredit = creditAccount(CreditDebitRequest.builder()
+                .accountNumber(request.getDestinationAccountNumber())
+                .amount(request.getAmount())
+                .build());
+
+        if(resultCredit.getResponseCode().equals(AccountUtils.ACCOUNT_NO_EXIST_CODE))
+        {
+            return resultCredit;
+        }
+
+        return BankResponse.builder()
+                .responseCode(AccountUtils.ACCOUNT_TRANSFERT_SUCCESS_CODE)
+                .responseMessage("Votre compte a été débité de la somme de " + request.getAmount() + " pour crédité le compte avec pour numero " + request.getDestinationAccountNumber() + " et pour nom utilisateur " + resultCredit.getAccountInfo().getAccountName())
+                .accountInfo(AccountInfo.builder()
+                        .accountNumber(resultDebit.getAccountInfo().getAccountNumber())
+                        .accountName(resultDebit.getAccountInfo().getAccountName())
+                        .accountBalance(resultDebit.getAccountInfo().getAccountBalance())
+                        .build())
+                .build();
     }
 }

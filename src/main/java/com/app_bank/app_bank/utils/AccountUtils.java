@@ -20,6 +20,8 @@ public class AccountUtils {
     public static final String ACCOUNT_BALANCE_NOT_SUFFICIENT_CODE = "006";
     public static final String ACCOUNT_BALANCE_NOT_SUFFICIENT_MESSAGE = "Le solde du compte est insuffisant";
     public static final String ACCOUNT_DEBITED_SUCCESS_CODE = "007";
+    public static final String ACCOUNT_TRANSFERT_SUCCESS_CODE = "008";
+    public static final String ACCOUNT_TRANSFERT_SUCCESS_MESSAGE = "";
 
     public static String generateAccountNumber(){
 
