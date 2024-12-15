@@ -13,10 +13,12 @@ public class UserServiceImpl implements UserService{
 
     private UserRepository userRespository;
     private EmailService emailService;
+    private TransactionService transactionService;
 
-    public UserServiceImpl(EmailService emailService, UserRepository userRespository) {
+    public UserServiceImpl(EmailService emailService, UserRepository userRespository, TransactionService transactionService) {
         this.emailService = emailService;
         this.userRespository = userRespository;
+        this.transactionService = transactionService;
     }
 
 
@@ -127,6 +129,11 @@ public class UserServiceImpl implements UserService{
         foundUser.setAccountBalance(foundUser.getAccountBalance().add(request.getAmount()));
         this.userRespository.save(foundUser);
 
+        this.transactionService.saveTransaction(TransactionDto.builder()
+                        .transactionType("CREDITE")
+                        .accountNumber(request.getAccountNumber())
+                        .amount(request.getAmount())
+                        .build());
 
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_CREDITED_SUCCESS_CODE)
@@ -172,6 +179,12 @@ public class UserServiceImpl implements UserService{
 
         foundUser.setAccountBalance(foundUser.getAccountBalance().subtract(request.getAmount()));
         this.userRespository.save(foundUser);
+
+        this.transactionService.saveTransaction(TransactionDto.builder()
+                .transactionType("DEBITE")
+                .accountNumber(request.getAccountNumber())
+                .amount(request.getAmount())
+                .build());
 
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_DEBITED_SUCCESS_CODE)
