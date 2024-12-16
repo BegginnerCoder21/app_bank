@@ -2,6 +2,7 @@ package com.app_bank.app_bank.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -31,7 +32,7 @@ public class User {
     private String phoneNumber;
     private String alternativePhoneNumber;
     private String status;
-    @UpdateTimestamp
+    @CreationTimestamp
     private LocalDateTime createAt;
     @UpdateTimestamp
     private LocalDateTime modifiedAt;

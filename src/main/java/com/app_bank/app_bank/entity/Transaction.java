@@ -2,8 +2,11 @@ package com.app_bank.app_bank.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "transactions")
@@ -21,4 +24,8 @@ public class Transaction {
     private String accountNumber;
     private BigDecimal amount;
     private String status;
+    @CreationTimestamp
+    private LocalDateTime createAt;
+    @UpdateTimestamp
+    private LocalDateTime modifiedAt;
 }

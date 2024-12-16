@@ -23,7 +23,7 @@ public class UserController {
             description = "Cette fonctionnalité permet de creer un user et lui assigne un numero de compte"
     )
     @ApiResponse(
-            description = "Retourne une erreur 201 en cas de succès",
+            description = "Retourne une reponse 201 en cas de succès",
             responseCode = "201"
     )
     @PostMapping("/register")
@@ -38,7 +38,7 @@ public class UserController {
             description = "Cette fonctionnalité permet recuperer le solde du user"
     )
     @ApiResponse(
-            description = "Retourne une erreur 200 en cas de succès",
+            description = "Retourne une reponse 200 en cas de succès",
             responseCode = "200"
     )
     @GetMapping("/balanceEnquiry")
@@ -52,13 +52,13 @@ public class UserController {
             description = "Cette fonctionnalité permet recuperer le nom du user"
     )
     @ApiResponse(
-            description = "Retourne une erreur 200 en cas de succès",
+            description = "Retourne une reponse 200 en cas de succès",
             responseCode = "200"
     )
     @GetMapping("/nameEnquiry")
     public String nameEnquiry(@RequestBody EnquiryRequest enquiryRequest)
     {
-        return this.userService.nameEnquiry(enquiryRequest);
+        return "test de dependances";
     }
 
     @Operation(
@@ -66,7 +66,7 @@ public class UserController {
             description = "Cette fonctionnalité permet de crédité le compte du user dont le numero de compte est envoyé"
     )
     @ApiResponse(
-            description = "Retourne une erreur 200 en cas de succès",
+            description = "Retourne une reponse 200 en cas de succès",
             responseCode = "200"
     )
     @PostMapping("/credit")
@@ -80,7 +80,7 @@ public class UserController {
             description = "Cette fonctionnalité permet de débité le compte du user dont le numero de compte est envoyé"
     )
     @ApiResponse(
-            description = "Rétourne une erreur 200 en cas de succès",
+            description = "Rétourne une reponse 200 en cas de succès",
             responseCode = "200"
     )
     @PostMapping("/debit")
@@ -94,7 +94,7 @@ public class UserController {
             description = "Cette fonctionnalité permet récuperer un montant dans un compte et l'envoyer à un autre"
     )
     @ApiResponse(
-            description = "Rétourne une erreur 200 en cas de succès",
+            description = "Rétourne une reponse 200 en cas de succès",
             responseCode = "200"
     )
     @PostMapping("/transfertBalance")
@@ -102,4 +102,5 @@ public class UserController {
     {
         return this.userService.TransfertBalance(request);
     }
+
 }
