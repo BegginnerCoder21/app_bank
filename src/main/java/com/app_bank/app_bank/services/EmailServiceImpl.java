@@ -1,11 +1,19 @@
 package com.app_bank.app_bank.services;
 
 import com.app_bank.app_bank.dto.EmailDetails;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+
+@Slf4j
 @Service
 public class EmailServiceImpl implements EmailService {
 
@@ -33,6 +41,31 @@ public class EmailServiceImpl implements EmailService {
 
         } catch (RuntimeException e) {
             System.out.println("Error d'envoi de mail");
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendMailWithAttachment(EmailDetails emailDetails) {
+
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper;
+
+        try {
+            mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+            mimeMessageHelper.setFrom(senderMail);
+            mimeMessageHelper.setSubject(emailDetails.getSubject());
+            mimeMessageHelper.setText(emailDetails.getMailBody());
+            mimeMessageHelper.setTo(emailDetails.getRecipient());
+
+            FileSystemResource file = new FileSystemResource(new File(emailDetails.getAttachment()));
+            mimeMessageHelper.addAttachment(file.getFilename(), file);
+
+            javaMailSender.send(mimeMessage);
+            log.info(file.getFilename() + " a été envoyé par mail a " + emailDetails.getRecipient());
+
+        } catch (MessagingException e) {
+
             throw new RuntimeException(e);
         }
     }

@@ -1,5 +1,6 @@
 package com.app_bank.app_bank.services;
 
+import com.app_bank.app_bank.dto.EmailDetails;
 import com.app_bank.app_bank.dto.StatementRequest;
 import com.app_bank.app_bank.entity.Transaction;
 import com.app_bank.app_bank.entity.User;
@@ -28,7 +29,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BankStatement {
 
-
+    private EmailService emailService;
     private TransactionRepository transactionRepository;
     private UserRepository userRepository;
     private static final String FILE = "C:\\Users\\Public\\Downloads\\MyStatement.pdf";
@@ -126,5 +127,14 @@ public class BankStatement {
         document.add(statementInfo);
         document.add(transactionTable);
         document.close();
+
+        //Envoi de mail avec le fichier pdf des statistiques
+        this.emailService.sendMailWithAttachment(EmailDetails.builder()
+                .recipient(user.getEmail())
+                .subject("STATISTIQUE DU COMPTE UTILISATEUR")
+                .mailBody("Récevez par ce mail les statistiques de toutes vos transactions !")
+                .attachment(FILE)
+                .build());
+
     }
 }
