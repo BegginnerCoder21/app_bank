@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Api de gestion des comptes utilisateur")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -23,7 +23,7 @@ public class UserController {
             description = "Cette fonctionnalité permet de creer un user et lui assigne un numero de compte"
     )
     @ApiResponse(
-            description = "Retourne une reponse 201 en cas de succès",
+            description = "Rétourne une reponse 201 en cas de succès",
             responseCode = "201"
     )
     @PostMapping("/register")
@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @Operation(
-            summary = "Recuperation du solde du compte user",
+            summary = "Récuperation du solde du compte user",
             description = "Cette fonctionnalité permet recuperer le solde du user"
     )
     @ApiResponse(
@@ -48,17 +48,17 @@ public class UserController {
     }
 
     @Operation(
-            summary = "Recuperation du nom du compte user",
+            summary = "Récuperation du nom du compte user",
             description = "Cette fonctionnalité permet recuperer le nom du user"
     )
     @ApiResponse(
-            description = "Retourne une reponse 200 en cas de succès",
+            description = "Rétourne une reponse 200 en cas de succès",
             responseCode = "200"
     )
     @GetMapping("/nameEnquiry")
     public String nameEnquiry(@RequestBody EnquiryRequest enquiryRequest)
     {
-        return "test de dependances";
+        return this.userService.nameEnquiry(enquiryRequest);
     }
 
     @Operation(

@@ -4,6 +4,7 @@ import com.app_bank.app_bank.dto.*;
 import com.app_bank.app_bank.entity.User;
 import com.app_bank.app_bank.repository.UserRepository;
 import com.app_bank.app_bank.utils.AccountUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -11,14 +12,16 @@ import java.math.BigDecimal;
 @Service
 public class UserServiceImpl implements UserService{
 
-    private UserRepository userRespository;
-    private EmailService emailService;
-    private TransactionService transactionService;
+    private final UserRepository userRespository;
+    private final EmailService emailService;
+    private final TransactionService transactionService;
+    private PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(EmailService emailService, UserRepository userRespository, TransactionService transactionService) {
+    public UserServiceImpl(EmailService emailService, UserRepository userRespository, TransactionService transactionService, PasswordEncoder passwordEncoder) {
         this.emailService = emailService;
         this.userRespository = userRespository;
         this.transactionService = transactionService;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -43,6 +46,7 @@ public class UserServiceImpl implements UserService{
                 .accountNumber(AccountUtils.generateAccountNumber())
                 .accountBalance(BigDecimal.ZERO)
                 .email(userRequest.getEmail())
+                .password(passwordEncoder.encode(userRequest.getPassword()))
                 .phoneNumber(userRequest.getPhoneNumber())
                 .alternativePhoneNumber(userRequest.getAlternativePhoneNumber())
                 .status("ACTIF")

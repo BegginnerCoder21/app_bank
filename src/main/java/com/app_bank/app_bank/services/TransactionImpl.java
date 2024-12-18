@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransactionImpl implements TransactionService{
 
-    private TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
     public TransactionImpl(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;

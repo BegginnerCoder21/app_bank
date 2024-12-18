@@ -17,7 +17,7 @@ import java.io.File;
 @Service
 public class EmailServiceImpl implements EmailService {
 
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
 
     public EmailServiceImpl(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
