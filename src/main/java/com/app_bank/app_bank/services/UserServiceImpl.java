@@ -1,9 +1,13 @@
 package com.app_bank.app_bank.services;
 
+import com.app_bank.app_bank.config.JwtTokenProvider;
 import com.app_bank.app_bank.dto.*;
 import com.app_bank.app_bank.entity.User;
 import com.app_bank.app_bank.repository.UserRepository;
 import com.app_bank.app_bank.utils.AccountUtils;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,15 +19,18 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRespository;
     private final EmailService emailService;
     private final TransactionService transactionService;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+    private AuthenticationManager authenticationManager;
+    private JwtTokenProvider jwtTokenProvider;
 
-    public UserServiceImpl(EmailService emailService, UserRepository userRespository, TransactionService transactionService, PasswordEncoder passwordEncoder) {
-        this.emailService = emailService;
+    public UserServiceImpl(UserRepository userRespository, EmailService emailService, TransactionService transactionService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
         this.userRespository = userRespository;
+        this.emailService = emailService;
         this.transactionService = transactionService;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
-
 
     @Override
     public BankResponse createAccount(UserRequest userRequest) {
@@ -46,8 +53,9 @@ public class UserServiceImpl implements UserService{
                 .accountNumber(AccountUtils.generateAccountNumber())
                 .accountBalance(BigDecimal.ZERO)
                 .email(userRequest.getEmail())
-                .password(passwordEncoder.encode(userRequest.getPassword()))
+                .password(this.passwordEncoder.encode(userRequest.getPassword()))
                 .phoneNumber(userRequest.getPhoneNumber())
+                .role(userRequest.getRole())
                 .alternativePhoneNumber(userRequest.getAlternativePhoneNumber())
                 .status("ACTIF")
                 .build();
@@ -70,6 +78,28 @@ public class UserServiceImpl implements UserService{
                         .accountNumber(saveUser.getAccountNumber())
                         .accountBalance(saveUser.getAccountBalance())
                         .build())
+                .build();
+    }
+
+    public BankResponse login(LoginDto loginDto)
+    {
+        System.out.println(loginDto.getEmail());
+        System.out.println(loginDto.getPassword());
+        Authentication authentication = this.authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+        );
+        EmailDetails loginAlert = EmailDetails.builder()
+                .recipient(loginDto.getEmail())
+                .subject("Connexion A Votre Compte")
+                .mailBody("Une connexion viens d'être effectué sur votre compte. \nS'il ne s'agit pas de vous veillez contacter votre banque le plus tôt possible.")
+                .build();
+
+        this.emailService.sendMailAlert(loginAlert);
+
+        return BankResponse.builder()
+                .responseCode(AccountUtils.LOGIN_SUCCESS_CODE)
+                .responseMessage(this.jwtTokenProvider.generateToken(authentication))
+                .accountInfo(null)
                 .build();
     }
 
@@ -192,7 +222,7 @@ public class UserServiceImpl implements UserService{
 
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_DEBITED_SUCCESS_CODE)
-                .responseMessage("Le compte a bien été dédité de " + request.getAmount())
+                .responseMessage("Le compte a bien été débité de " + request.getAmount())
                 .accountInfo(AccountInfo.builder()
                         .accountNumber(foundUser.getAccountNumber())
                         .accountName(AccountUtils.fullNameUser(foundUser))

@@ -34,6 +34,20 @@ public class UserController {
     }
 
     @Operation(
+            summary = "Connexion d'un compte utilisateur",
+            description = "Cette fonctionnalité de se connecter à son compte"
+    )
+    @ApiResponse(
+            description = "Rétourne une reponse 200 en cas de succès",
+            responseCode = "200"
+    )
+    @PostMapping("/login")
+    public BankResponse login(@RequestBody LoginDto loginDto)
+    {
+        return this.userService.login(loginDto);
+    }
+
+    @Operation(
             summary = "Récuperation du solde du compte user",
             description = "Cette fonctionnalité permet recuperer le solde du user"
     )
